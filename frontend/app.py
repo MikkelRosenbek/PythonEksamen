@@ -16,7 +16,7 @@ if uploaded_file:
         st.subheader("Nøgletal")
         st.write(stats)
     # Grafer
-    for plot_type, label in zip(["distance", "speed", "effort"], ["Distance", "Hastighed", "Effort"]):
+    for plot_type, label in zip(["distance", "speed"], ["Distance", "Hastighed"]):
         resp = requests.post(f"http://localhost:8000/plot/{plot_type}", files=files)
         if resp.ok:
             st.subheader(f"{label} over tid")

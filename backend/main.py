@@ -20,8 +20,6 @@ async def plot(plot_type: str, file: UploadFile = File(...)):
 		img = plots.plot_distance_over_time(df)
 	elif plot_type == "speed":
 		img = plots.plot_avg_speed_over_time(df)
-	elif plot_type == "effort":
-		img = plots.plot_effort_over_time(df)
 	else:
 		return JSONResponse({"error": "Invalid plot type"}, status_code=400)
 	return StreamingResponse(io.BytesIO(img), media_type="image/png")

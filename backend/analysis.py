@@ -14,6 +14,6 @@ def calculate_stats(df: pd.DataFrame) -> Dict[str, Any]:
 		"avg_speed": float(df["avg_speed_kmh"].mean()),
 		"num_rides": int(df.shape[0]),
 		"longest_ride": float(df["distance_km"].max()),
-		"hardest_ride": int(df["effort"].idxmax()),
+		# "hardest_ride" fjernet, da effort ikke længere bruges
 	}
 	return stats

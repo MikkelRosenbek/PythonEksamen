@@ -1,4 +1,5 @@
 
+
 import matplotlib.pyplot as plt
 import pandas as pd
 from io import BytesIO
@@ -22,19 +23,6 @@ def plot_avg_speed_over_time(df: pd.DataFrame) -> bytes:
 	ax.set_title("Gennemsnitshastighed pr. tur")
 	ax.set_xlabel("Dato")
 	ax.set_ylabel("Hastighed (km/t)")
-	fig.autofmt_xdate()
-	buf = BytesIO()
-	plt.savefig(buf, format="png")
-	plt.close(fig)
-	buf.seek(0)
-	return buf.read()
-
-def plot_effort_over_time(df: pd.DataFrame) -> bytes:
-	fig, ax = plt.subplots()
-	ax.plot(df["date"], df["effort"], marker="o", color="red")
-	ax.set_title("Oplevet hårdhed pr. tur")
-	ax.set_xlabel("Dato")
-	ax.set_ylabel("Effort")
 	fig.autofmt_xdate()
 	buf = BytesIO()
 	plt.savefig(buf, format="png")

@@ -23,6 +23,6 @@ uvicorn backend.main:app --reload
 streamlit run frontend/app.py
 ```
 
-5. Åbn Streamlit i din browser (typisk på http://localhost:8501), upload sample.csv og se resultaterne.
+5. Åbn Streamlit i din browser (typisk på http://localhost:8501), upload myData.csv og se resultaterne.
 
 Hvis du senere vil køre med Docker Compose, kan du nemt tilføje Dockerfiles og docker-compose.yml.

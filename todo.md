@@ -7,8 +7,8 @@
   - **Hvorfor:** Giver klar adskillelse af frontend, backend, tests og data, og forbereder til Docker Compose.
 
 ### 2. Data og CSV-format
-- Lav eksempel-CSV med sample-data (fx fiktive målinger):
-  - **Fil:** data/sample.csv
+- Lav eksempel-CSV med myData-data (fx fiktive målinger):
+  - **Fil:** data/myData.csv
   - **Hvorfor:** Giver grundlag for dataanalyse og test af hele flowet.
 - Beskriv CSV-formatet i README:
   - **Fil:** README.md

@@ -4,12 +4,12 @@ import io
 from pathlib import Path
 from typing import List
 
-from fastapi import FastAPI
+from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse, StreamingResponse
 from pydantic import BaseModel, Field
 
 from . import analysis, llm, plots
-from .data_store import append_ride, load_data
+from .data_store import append_ride, delete_ride, load_data, update_ride
 
 
 app = FastAPI()
@@ -17,6 +17,7 @@ app = FastAPI()
 
 class RideInput(BaseModel):
     date: str
+    ride_name: str = Field(..., min_length=1)
     distance_km: float = Field(..., gt=0)
     duration_min: float = Field(..., gt=0)
     avg_speed_kmh: float = Field(..., gt=0)
@@ -40,6 +41,36 @@ async def create_ride(ride: RideInput):
     return JSONResponse(
         {
             "message": "Ride saved to data/myData.csv",
+            "num_rides": int(df.shape[0]),
+        }
+    )
+
+
+@app.put("/rides/{ride_id}")
+async def edit_ride(ride_id: int, ride: RideInput):
+    try:
+        df = update_ride(ride_id, ride.model_dump())
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+    return JSONResponse(
+        {
+            "message": "Ride updated in data/myData.csv",
+            "num_rides": int(df.shape[0]),
+        }
+    )
+
+
+@app.delete("/rides/{ride_id}")
+async def remove_ride(ride_id: int):
+    try:
+        df = delete_ride(ride_id)
+    except ValueError as exc:
+        raise HTTPException(status_code=404, detail=str(exc)) from exc
+
+    return JSONResponse(
+        {
+            "message": "Ride deleted from data/myData.csv",
             "num_rides": int(df.shape[0]),
         }
     )

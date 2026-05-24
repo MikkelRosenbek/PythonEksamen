@@ -1,7 +1,5 @@
 from __future__ import annotations
-
 from datetime import date
-
 import pandas as pd
 import requests
 import streamlit as st

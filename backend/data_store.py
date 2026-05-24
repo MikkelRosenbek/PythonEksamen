@@ -10,12 +10,14 @@ CSV_COLUMNS = ["date", "distance_km", "duration_min", "avg_speed_kmh", "elevatio
 
 
 def load_data() -> pd.DataFrame:
+    # Brug en tom DataFrame med kendte kolonner, hvis datafilen endnu ikke findes.
     if not DATA_FILE.exists():
         return pd.DataFrame(columns=CSV_COLUMNS)
     return pd.read_csv(DATA_FILE, parse_dates=["date"])
 
 
 def save_data(df: pd.DataFrame) -> None:
+    # Gem datoer i et stabilt CSV-format, så filen er læsbar og konsistent.
     df_to_save = df.copy()
     if "date" in df_to_save.columns:
         df_to_save["date"] = pd.to_datetime(df_to_save["date"]).dt.strftime("%Y-%m-%d")
@@ -23,6 +25,7 @@ def save_data(df: pd.DataFrame) -> None:
 
 
 def append_ride(ride: dict) -> pd.DataFrame:
+    # Tilføj en ny tur, sorter på dato og skriv hele datasættet tilbage til CSV.
     df = load_data()
     new_row = pd.DataFrame([ride], columns=CSV_COLUMNS)
     new_row["date"] = pd.to_datetime(new_row["date"])

@@ -15,14 +15,24 @@ pip install -r requirements.txt
 
 3. Start backend (FastAPI):
 ```
-uvicorn backend.main:app --reload
+python -m uvicorn backend.main:app --reload
 ```
 
 4. Start frontend (Streamlit):
 ```
-streamlit run frontend/app.py
+python -m streamlit run frontend/app.py
 ```
 
-5. Åbn Streamlit i din browser (typisk på http://localhost:8501), upload myData.csv og se resultaterne.
+5. Åbn Streamlit i din browser (typisk på http://localhost:8501).
+
+6. Indtast en cykeltur i formularen i frontend og tryk på `Gem tur`.
+
+7. Data gemmes automatisk i `data/myData.csv`, og nøgletal, grafer og AI-feedback opdateres på baggrund af den samlede fil.
+
+CSV-formatet i `data/myData.csv` er:
+```csv
+date,distance_km,duration_min,avg_speed_kmh,elevation_m
+2026-05-09,75.04,169,26.9,422
+```
 
 Hvis du senere vil køre med Docker Compose, kan du nemt tilføje Dockerfiles og docker-compose.yml.

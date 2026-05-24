@@ -2,8 +2,10 @@ import matplotlib.pyplot as plt
 import pandas as pd
 from io import BytesIO
 
+
 def plot_distance_over_time(df: pd.DataFrame) -> bytes:
     fig, ax = plt.subplots()
+    # Vis en tom besked i stedet for at lade Matplotlib fejle eller vise en tom akse.
     if df.empty:
         ax.text(0.5, 0.5, "Ingen ture registreret endnu", ha="center", va="center")
         ax.set_axis_off()
@@ -19,8 +21,10 @@ def plot_distance_over_time(df: pd.DataFrame) -> bytes:
     buf.seek(0)
     return buf.read()
 
+
 def plot_avg_speed_over_time(df: pd.DataFrame) -> bytes:
     fig, ax = plt.subplots()
+    # Brug samme tom-state som distancegrafen for et stabilt frontend-flow.
     if df.empty:
         ax.text(0.5, 0.5, "Ingen ture registreret endnu", ha="center", va="center")
         ax.set_axis_off()

@@ -23,6 +23,7 @@ class RideInput(BaseModel):
 
 @app.get("/rides/")
 async def get_rides():
+    # Frontend bruger dette endpoint til at vise alle registrerede ture i tabellen.
     df = load_data().sort_values("date", ascending=False)
     records: List[dict] = df.assign(
         date=df["date"].dt.strftime("%Y-%m-%d")
@@ -32,6 +33,7 @@ async def get_rides():
 
 @app.post("/rides/")
 async def create_ride(ride: RideInput):
+    # Gem en ny tur i CSV-filen og returner en enkel bekræftelse til frontend.
     df = append_ride(ride.model_dump())
     return JSONResponse(
         {
@@ -43,6 +45,7 @@ async def create_ride(ride: RideInput):
 
 @app.get("/analyze/")
 async def analyze_data():
+    # Statistik læses altid fra den aktuelle CSV-fil, så frontend viser samlet status.
     df = load_data()
     stats = analysis.calculate_stats(df)
     return JSONResponse(stats)
@@ -50,6 +53,7 @@ async def analyze_data():
 
 @app.get("/plot/{plot_type}")
 async def plot(plot_type: str):
+    # Grafer genereres dynamisk fra de seneste data i CSV-filen.
     df = load_data()
     if plot_type == "distance":
         img = plots.plot_distance_over_time(df)
@@ -62,6 +66,7 @@ async def plot(plot_type: str):
 
 @app.get("/llm/")
 async def llm_feedback():
+    # AI-feedback bygger på de samme nøgletal som frontend viser.
     df = load_data()
     stats = analysis.calculate_stats(df)
     feedback = llm.get_llm_feedback(stats)

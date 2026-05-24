@@ -11,6 +11,7 @@ API_BASE_URL = "http://localhost:8000"
 
 
 def fetch_json(path: str) -> dict | None:
+    # Saml fejlvisning ét sted, så frontend reagerer ens på backend-fejl.
     try:
         response = requests.get(f"{API_BASE_URL}{path}", timeout=10)
         response.raise_for_status()
@@ -21,6 +22,7 @@ def fetch_json(path: str) -> dict | None:
 
 
 def render_stats() -> None:
+    # Hent og vis de vigtigste nøgletal øverst på siden.
     stats = fetch_json("/analyze/")
     if not stats:
         return
@@ -34,12 +36,14 @@ def render_stats() -> None:
 
 
 def render_plots() -> None:
+    # Streamlit kan vise billeder direkte fra backendens plot-endpoints.
     st.subheader("Grafer")
     st.image(f"{API_BASE_URL}/plot/distance", caption="Distance over tid")
     st.image(f"{API_BASE_URL}/plot/speed", caption="Hastighed over tid")
 
 
 def render_feedback() -> None:
+    # AI-feedback vises kun, hvis backend returnerer et gyldigt svar.
     feedback = fetch_json("/llm/")
     if feedback and "feedback" in feedback:
         st.subheader("AI-coach feedback")
@@ -47,6 +51,7 @@ def render_feedback() -> None:
 
 
 def render_rides_table() -> None:
+    # Tabellen giver brugeren et direkte overblik over indholdet i myData.csv.
     rides_payload = fetch_json("/rides/")
     if not rides_payload:
         return
@@ -66,6 +71,7 @@ st.title("Personlig cykeltræner")
 st.write("Registrer dine cykelture direkte i formularen. Data gemmes i `data/myData.csv`.")
 
 with st.form("ride_form", clear_on_submit=True):
+    # Formularen opretter én ny tur ad gangen og sender den til backend som JSON.
     st.subheader("Ny cykeltur")
     col1, col2 = st.columns(2)
     ride_date = col1.date_input("Dato", value=date.today(), format="YYYY-MM-DD")
@@ -79,6 +85,7 @@ with st.form("ride_form", clear_on_submit=True):
     submitted = st.form_submit_button("Gem tur")
 
 if submitted:
+    # Payload matcher Pydantic-modellen i backend.
     payload = {
         "date": ride_date.strftime("%Y-%m-%d"),
         "distance_km": distance_km,
@@ -89,6 +96,7 @@ if submitted:
     try:
         response = requests.post(f"{API_BASE_URL}/rides/", json=payload, timeout=10)
         response.raise_for_status()
+        # Genindlæs siden efter succes, så statistik, grafer og tabel opdateres samlet.
         st.success("Turen blev gemt i data/myData.csv.")
         st.rerun()
     except requests.RequestException as exc:

@@ -2,40 +2,37 @@
 
 **Navn:** Mikkel Rosenbek  
 **Mail:** Miro0002@stud.ek.dk  
-**Fag:** Python, Forår 2026  
-
----
+**Fag:** Python, Forår 2026
 
 ## Projekttitel
 
 **Personlig cykeltræner**
 
----
-
 ## Beskrivelse af programmet
 
-Jeg vil lave en webapplikation, der fungerer som en simpel personlig cykeltræner. Brugeren skal kunne uploade en CSV-fil med data fra sine cykelture og derefter få et overblik over sin træning.
+Jeg har lavet en webapplikation, der fungerer som en simpel personlig cykeltræner. Brugeren indtaster data om sine cykelture direkte i frontend gennem en formular i stedet for at uploade en CSV-fil. Når en ny tur gemmes, bliver den skrevet til `data/myData.csv`.
 
-Programmet skal vise centrale nøgletal som samlet distance, samlet træningstid, gennemsnitshastighed, antal ture, længste tur og hårdeste tur. Derudover skal applikationen vise grafer, så brugeren kan se udviklingen i sin træning over tid, fx distance pr. tur, gennemsnitshastighed og træningsbelastning.
+Programmet viser centrale nøgletal som samlet distance, samlet træningstid, gennemsnitshastighed, antal ture og længste tur. Derudover viser applikationen grafer over udviklingen i træningen over tid, blandt andet distance pr. tur og gennemsnitshastighed pr. tur.
 
-Brugeren skal også kunne få AI-baseret feedback på sin træning. AI-coachen skal forklare dataene i et letforståeligt sprog og komme med forslag til næste træningspas. Programmet skal ikke erstatte en rigtig træner, men fungere som en prototype, der viser, hvordan dataanalyse og en LLM kan kombineres.
-
----
+Brugeren kan også få AI-baseret feedback på sin træning. AI-coachen bruger de samlede data fra `myData.csv` og giver et kort, letforståeligt overblik samt forslag til næste træningspas.
 
 ## Data
 
-Programmet bruger cykeldata fra en CSV-fil, som brugeren uploader i applikationen. I første version bruger jeg eksempeldata eller manuelt indtastede data baseret på egne cykelture. Jeg bruger ikke Strava eller Garmin API i første version, fordi det vil gøre projektet unødvendigt komplekst.
+Programmet bruger en lokal CSV-fil, `data/myData.csv`, som internt datalager. Brugeren arbejder ikke direkte med filen, men opretter i stedet nye ture gennem formularfelter i frontend.
 
-CSV-filen skal blandt andet indeholde:
+CSV-filen indeholder disse kolonner:
 
-- dato
-- distance i km
-- tid
-- gennemsnitshastighed
-- højdemeter
-- oplevet hårdhed/effort
+- `date`
+- `distance_km`
+- `duration_min`
+- `avg_speed_kmh`
+- `elevation_m`
 
-Eksempel på kolonner:
+Eksempel:
 
 ```csv
-date,distance_km,duration_min,avg_speed_kmh,elevation_m,effort
+date,distance_km,duration_min,avg_speed_kmh,elevation_m
+2026-05-09,75.04,169,26.9,422
+```
+
+I denne version bruges der ikke Strava-, Garmin- eller andre eksterne API'er. Fokus er på en enkel og lokal løsning, hvor brugeren kan registrere ture manuelt og få analyse, grafer og AI-feedback på baggrund af egne data.

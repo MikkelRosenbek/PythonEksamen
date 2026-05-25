@@ -5,3 +5,4 @@ numpy
 matplotlib
 requests
 streamlit
+pytest

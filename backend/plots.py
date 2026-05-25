@@ -1,3 +1,7 @@
+import matplotlib
+# Use a non-GUI backend so plots can be rendered in tests and headless environments.
+matplotlib.use("Agg")
+
 import matplotlib.pyplot as plt
 import pandas as pd
 from io import BytesIO

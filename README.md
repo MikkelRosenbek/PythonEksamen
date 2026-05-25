@@ -1,47 +1,192 @@
 # Personlig cykeltræner
 
-En webapplikation til manuel registrering og analyse af cykelture. Brugeren indtaster ture i en Streamlit-frontend, data gemmes i `data/myData.csv`, og en FastAPI-backend leverer statistik, grafer og AI-feedback.
+En webapplikation til registrering og analyse af cykelture. Brugeren indtaster ture i en Streamlit-frontend, data gemmes i `data/myData.csv`, og en FastAPI-backend leverer statistik, grafer og AI-feedback via en lokal Ollama-model.
+
+## Sådan starter du programmet
+
+Den nemmeste måde er at bruge Docker Compose. Alternativt kan du køre backend og frontend lokalt uden Docker.
+
+### Mulighed 1: Docker Compose
+
+Denne løsning starter frontend og backend i containere. Ollama kører stadig lokalt på din egen maskine.
+
+#### Krav
+
+- Docker Desktop installeret og kørende
+- Ollama installeret og kørende
+- modellen `llama3.2:3b` installeret i Ollama
+
+Kontrollér fx Ollama sådan:
+
+```bash
+ollama list
+```
+
+Start hele applikationen:
+
+```bash
+docker compose up -d
+```
+
+Åbn derefter:
+
+```text
+http://localhost:8501
+```
+
+Stop applikationen igen:
+
+```bash
+docker compose down
+```
+
+Se logs:
+
+```bash
+docker compose logs -f
+```
+
+### Mulighed 2: Kør projektet lokalt på Windows
+
+#### 1. Opret og aktivér virtuelt miljø
+
+```powershell
+python -m venv venv
+.\venv\Scripts\Activate.ps1
+```
+
+#### 2. Installer afhængigheder
+
+```powershell
+pip install -r requirements.txt
+```
+
+#### 3. Start Ollama
+
+Kontrollér at modellen findes:
+
+```powershell
+ollama list
+```
+
+Hvis `llama3.2:3b` mangler:
+
+```powershell
+ollama pull llama3.2:3b
+```
+
+#### 4. Start backend
+
+```powershell
+python -m uvicorn backend.main:app --reload
+```
+
+#### 5. Start frontend i en ny terminal
+
+```powershell
+.\venv\Scripts\Activate.ps1
+python -m streamlit run frontend/app.py
+```
+
+Åbn derefter:
+
+```text
+http://localhost:8501
+```
+
+### Mulighed 3: Kør projektet lokalt på macOS
+
+#### 1. Opret og aktivér virtuelt miljø
+
+```bash
+python3 -m venv venv
+source venv/bin/activate
+```
+
+#### 2. Installer afhængigheder
+
+```bash
+pip install -r requirements.txt
+```
+
+#### 3. Start Ollama
+
+Kontrollér at modellen findes:
+
+```bash
+ollama list
+```
+
+Hvis `llama3.2:3b` mangler:
+
+```bash
+ollama pull llama3.2:3b
+```
+
+#### 4. Start backend
+
+```bash
+python -m uvicorn backend.main:app --reload
+```
+
+#### 5. Start frontend i en ny terminal
+
+```bash
+source venv/bin/activate
+python -m streamlit run frontend/app.py
+```
+
+Åbn derefter:
+
+```text
+http://localhost:8501
+```
+
+## Hvad programmet kan
+
+- oprette nye cykelture via formular
+- gemme ture i `data/myData.csv`
+- vise registrerede ture i en samlet oversigt
+- redigere eksisterende ture
+- slette ture
+- beregne nøgletal
+- vise grafer for distance og hastighed
+- generere AI-feedback ud fra træningsdata via Ollama
 
 ## Projektstatus
 
-Projektet fungerer som en kørende MVP:
+Projektet fungerer som en sammenhængende MVP med:
 
-- Frontend med formular til indtastning af cykelture
-- Lagring af ture i `data/myData.csv`
-- Backend-endpoints til ture, statistik, grafer og AI-feedback
-- Statistik for samlet distance, samlet tid, gennemsnitshastighed, antal ture og længste tur
-- Grafer for distance og gennemsnitshastighed over tid
-- Simpel placeholder til AI-coach feedback
+- Streamlit-frontend
+- FastAPI-backend
+- CSV-baseret datalagring
+- CRUD for ture
+- lokale grafer
+- lokal LLM-integration via Ollama
+- tests
+- `ruff` og `pyright`
+- Docker Compose
 
-Det, der stadig mangler før projektet er mere færdigt:
 
-- Rigtige tests
-- Rigtig LLM-integration i stedet for placeholder-tekst
-- Type checking- og lint-konfiguration
-- Docker-opsætning
-- Eventuelt redigering og sletning af ture
 
 ## Funktioner
 
 ### Frontend
 
-- Formular til registrering af:
-  - dato
-  - distance i km
-  - varighed i minutter
-  - gennemsnitshastighed i km/t
-  - højdemeter
-- Visning af:
-  - nøgletal
-  - grafer
-  - AI-feedback
-  - tabel med registrerede ture
+- formular til oprettelse og redigering af cykelture
+- kompakt tabelvisning af registrerede ture
+- knapper til `Ret` og `Slet`
+- visning af nøgletal
+- visning af grafer
+- visning af AI-feedback
 
 ### Backend
 
-- `GET /rides/` returnerer alle registrerede ture
-- `POST /rides/` gemmer en ny tur i `data/myData.csv`
-- `GET /analyze/` returnerer beregnede nøgletal
+- `GET /rides/` returnerer alle ture
+- `POST /rides/` opretter en ny tur
+- `PUT /rides/{ride_id}` opdaterer en tur
+- `DELETE /rides/{ride_id}` sletter en tur
+- `GET /analyze/` returnerer statistik
 - `GET /plot/distance` returnerer distancegraf
 - `GET /plot/speed` returnerer hastighedsgraf
 - `GET /llm/` returnerer AI-feedback
@@ -59,11 +204,17 @@ frontend/
   app.py
 data/
   myData.csv
-README.md
-Kørsel-lokalt.md
-Projektbeskrivelse.md
+test/
+  test_analysis.py
+  test_data_store.py
+  test_plots.py
+backend/Dockerfile
+frontend/Dockerfile
+docker-compose.yml
+pyproject.toml
+pytest.ini
 requirements.txt
-todo.md
+README.md
 ```
 
 ## Dataformat
@@ -71,163 +222,70 @@ todo.md
 Data gemmes i `data/myData.csv` med disse kolonner:
 
 ```csv
-date,distance_km,duration_min,avg_speed_kmh,elevation_m
-2026-05-09,75.04,169,26.9,422
+id,date,ride_name,distance_km,duration_min,avg_speed_kmh,elevation_m
+1,2026-05-24,Morgentur,42.50,95,26.8,210
 ```
 
 ### Felter
 
+- `id`: løbende heltal genereret af backend
 - `date`: dato i formatet `YYYY-MM-DD`
+- `ride_name`: navn på turen
 - `distance_km`: distance i kilometer
 - `duration_min`: varighed i minutter
 - `avg_speed_kmh`: gennemsnitshastighed i kilometer i timen
 - `elevation_m`: højdemeter
 
-## Krav
+## AI-feedback
 
-Afhængighederne er listet i `requirements.txt`:
-
-- `fastapi`
-- `uvicorn`
-- `pandas`
-- `numpy`
-- `matplotlib`
-- `requests`
-- `streamlit`
-
-## Installation
-
-### 1. Opret virtuelt miljø
-
-```powershell
-python -m venv venv
-.\venv\Scripts\Activate.ps1
-```
-
-### 2. Installer pakker
-
-```powershell
-pip install -r requirements.txt
-```
-
-## Kørsel
-
-### Start backend
-
-```powershell
-python -m uvicorn backend.main:app --reload
-```
-
-Backend kører typisk på:
+AI-feedbacken kører gennem Ollama og bruger som standard modellen:
 
 ```text
-http://localhost:8000
+llama3.2:3b
 ```
 
-### Start frontend
+Backend forventer som udgangspunkt:
 
-Åbn en ny terminal i projektmappen:
+- `OLLAMA_API_URL=http://localhost:11434/api/generate` ved lokal kørsel
+- `OLLAMA_API_URL=http://host.docker.internal:11434/api/generate` i Docker Compose
+
+Hvis Ollama ikke kører, vises en fallback-besked i frontend i stedet for at appen crasher.
+
+## Kvalitetssikring
+
+Projektet kan verificeres med:
+
+```bash
+python -m pytest test -q
+python -m ruff check backend frontend test
+python -m pyright
+```
+
+På Windows kan du også køre dem eksplicit via projektets venv:
 
 ```powershell
-.\venv\Scripts\Activate.ps1
-python -m streamlit run frontend/app.py
+.\venv\Scripts\python.exe -m pytest test -q
+.\venv\Scripts\python.exe -m ruff check backend frontend test
+.\venv\Scripts\python.exe -m pyright
 ```
 
-Frontend kører typisk på:
+## Teknologier
 
-```text
-http://localhost:8501
-```
-
-## Brug
-
-1. Start backend
-2. Start frontend
-3. Åbn Streamlit i browseren
-4. Udfyld formularen med en ny cykeltur
-5. Tryk på `Gem tur`
-6. Se opdaterede nøgletal, grafer og AI-feedback
-
-## Kodeoversigt
-
-### `backend/main.py`
-
-API-lag med endpoints til:
-
-- hente ture
-- oprette tur
-- beregne statistik
-- generere grafer
-- hente AI-feedback
-
-### `backend/data_store.py`
-
-Ansvarlig for:
-
-- læsning af `data/myData.csv`
-- skrivning til `data/myData.csv`
-- tilføjelse af nye ture
-
-### `backend/analysis.py`
-
-Beregner centrale nøgletal ud fra et pandas-dataframe.
-
-### `backend/plots.py`
-
-Genererer grafer som PNG-billeder via Matplotlib.
-
-### `backend/llm.py`
-
-Indeholder den nuværende placeholder til AI-feedback. Den er klar til at blive udskiftet med et rigtigt API-kald.
-
-### `frontend/app.py`
-
-Streamlit-brugerflade, som:
-
-- viser formular
-- sender nye ture til backend
-- henter statistik
-- viser grafer
-- viser AI-feedback
-
-## Hvad mangler
-
-### Høj prioritet
-
-- Skriv tests for backend-logik og plotfunktioner
-- Implementer rigtig LLM-integration
-- Tilføj bedre validering og fejlbeskeder
-
-### Mellem prioritet
-
-- Tilføj mulighed for at redigere eller slette ture
-- Tilføj flere nøgletal og grafer
-- Gør frontend mere poleret
-
-### Lav prioritet
-
-- Dockerfiles og `docker-compose.yml`
-- `pyrightconfig.json`
-- `pyproject.toml` med lint/type-check setup
+- Python
+- FastAPI
+- Streamlit
+- Pandas
+- NumPy
+- Matplotlib
+- Requests
+- Ollama
+- Pytest
+- Ruff
+- Pyright
+- Docker Compose
 
 ## Kendte begrænsninger
 
-- AI-feedback er i øjeblikket hardcoded placeholder-tekst
-- Der er ingen automatiske tests endnu
-- `docker-compose.yml` er endnu ikke sat op
-- Projektet bruger lokal CSV-fil i stedet for database
-
-## Verifikation
-
-Koden er senest verificeret med:
-
-```powershell
-venv\Scripts\python.exe -m compileall backend frontend
-```
-
-## Mulige næste skridt
-
-- skrive tests
-- koble en rigtig LLM på
-- tilføje CRUD for ture
-- lave en rigtig containeropsætning
+- projektet bruger CSV i stedet for database
+- AI-feedbackens kvalitet afhænger af den lokale Ollama-model
+- Ollama er ikke containeriseret i denne opsætning, men kører lokalt ved siden af Docker

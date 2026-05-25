@@ -6,3 +6,5 @@ matplotlib
 requests
 streamlit
 pytest
+ruff
+pyright

@@ -1,12 +1,13 @@
 from __future__ import annotations
 
+import os
 from datetime import date
 
 import requests
 import streamlit as st
 
 
-API_BASE_URL = "http://localhost:8000"
+API_BASE_URL = os.getenv("API_BASE_URL", "http://localhost:8000")
 
 
 def fetch_json(path: str) -> dict | None:
@@ -25,6 +26,17 @@ def get_rides() -> list[dict]:
     if not rides_payload:
         return []
     return rides_payload.get("rides", [])
+
+
+def fetch_image(path: str) -> bytes | None:
+    # Hent plotbilleder via backend, så samme kode virker både lokalt og i Docker.
+    try:
+        response = requests.get(f"{API_BASE_URL}{path}", timeout=120)
+        response.raise_for_status()
+        return response.content
+    except requests.RequestException as exc:
+        st.error(f"Kunne ikke hente graf fra backend: {exc}")
+        return None
 
 
 def get_edit_ride(rides: list[dict]) -> dict | None:
@@ -53,11 +65,16 @@ def render_stats() -> None:
 
 
 def render_plots() -> None:
-    # Streamlit kan vise billeder direkte fra backendens plot-endpoints.
+    # Hent plotbilleder som bytes, så frontend ikke afhænger af browserens netværksvej.
     st.subheader("Grafer")
     spacer_left, col1, spacer_mid, col2, spacer_right = st.columns([0.2, 1, 0.15, 1, 0.2])
-    col1.image(f"{API_BASE_URL}/plot/distance", caption="Distance over tid", width=470)
-    col2.image(f"{API_BASE_URL}/plot/speed", caption="Hastighed over tid", width=470)
+    distance_plot = fetch_image("/plot/distance")
+    speed_plot = fetch_image("/plot/speed")
+
+    if distance_plot:
+        col1.image(distance_plot, caption="Distance over tid", width=470)
+    if speed_plot:
+        col2.image(speed_plot, caption="Hastighed over tid", width=470)
 
 
 def render_feedback() -> None:
@@ -138,7 +155,13 @@ with st.form("ride_form"):
     duration_min = col4.number_input("Varighed (min)", min_value=1.0, step=1.0, format="%.0f", value=default_duration)
 
     col5, col6 = st.columns(2)
-    avg_speed_kmh = col5.number_input("Gns. hastighed (km/t)", min_value=0.1, step=0.1, format="%.1f", value=default_speed)
+    avg_speed_kmh = col5.number_input(
+        "Gns. hastighed (km/t)",
+        min_value=0.1,
+        step=0.1,
+        format="%.1f",
+        value=default_speed,
+    )
     elevation_m = col6.number_input("Højdemeter", min_value=0.0, step=1.0, format="%.0f", value=default_elevation)
 
     save_button_label = "Opdater tur" if is_editing else "Gem tur"

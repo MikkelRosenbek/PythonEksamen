@@ -1,0 +1,28 @@
+services:
+  backend:
+    build:
+      context: .
+      dockerfile: backend/Dockerfile
+    container_name: python-eksamen-backend
+    environment:
+      OLLAMA_API_URL: http://host.docker.internal:11434/api/generate
+      OLLAMA_MODEL: llama3.2:3b
+      OLLAMA_TIMEOUT_SECONDS: 120
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./data:/app/data
+
+  frontend:
+    build:
+      context: .
+      dockerfile: frontend/Dockerfile
+    container_name: python-eksamen-frontend
+    environment:
+      API_BASE_URL: http://backend:8000
+    depends_on:
+      - backend
+    ports:
+      - "8501:8501"

@@ -1,5 +1,6 @@
-import pandas as pd
 from typing import Dict, Any
+
+import pandas as pd
 
 
 def calculate_stats(df: pd.DataFrame) -> Dict[str, Any]:

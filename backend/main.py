@@ -99,8 +99,8 @@ async def plot(plot_type: str):
 
 @app.get("/llm/")
 async def llm_feedback():
-    # AI-feedback bygger på de samme nøgletal som frontend viser.
+    # AI-feedback bygger paa noegletal plus de seneste ture fra CSV-filen.
     df = load_data()
     stats = analysis.calculate_stats(df)
-    feedback = llm.get_llm_feedback(stats)
+    feedback = llm.get_llm_feedback(stats, df)
     return {"feedback": feedback}

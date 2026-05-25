@@ -10,9 +10,9 @@ API_BASE_URL = "http://localhost:8000"
 
 
 def fetch_json(path: str) -> dict | None:
-    # Saml fejlvisning ét sted, så frontend reagerer ens på backend-fejl.
+    # Samler fejlvisning ét sted, så frontend reagerer ens på backend-fejl.
     try:
-        response = requests.get(f"{API_BASE_URL}{path}", timeout=10)
+        response = requests.get(f"{API_BASE_URL}{path}", timeout=120)
         response.raise_for_status()
         return response.json()
     except requests.RequestException as exc:
@@ -112,7 +112,7 @@ def render_rides_table(rides: list[dict]) -> None:
 
 st.set_page_config(page_title="Personlig cykeltræner", layout="wide")
 st.title("Personlig cykeltræner")
-#st.write("Registrer dine cykelture direkte i formularen. Data gemmes i `data/myData.csv`.")
+
 
 rides = get_rides()
 edit_ride = get_edit_ride(rides)
